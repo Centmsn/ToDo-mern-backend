@@ -5,9 +5,44 @@ const User = require("../models/User");
 const Error = require("../models/Error");
 
 const postUserLogin = async (req, res, next) => {
-  console.log(req.body);
+  const errors = validationResult(req);
+  const { email, password } = req.body;
 
-  res.json({ message: "user OK" });
+  if (!errors.isEmpty()) {
+    //   if errors is not empty that means invalid data was passed by the user
+    const mapped = errors.mapped(error => error.param);
+    if (mapped.password) {
+      return next(new Error("Password must have 6-20 characters.", 422));
+    }
+  }
+
+  let existingUser;
+
+  try {
+    existingUser = await User.findOne({ email });
+  } catch (error) {
+    return next(new Error("Something went wrong, please try again later", 500));
+  }
+
+  if (!existingUser) {
+    return next(new Error("User does not exist", 422));
+  }
+
+  let isPasswordValid;
+
+  try {
+    isPasswordValid = await bcrypt.compare(password, existingUser.password);
+  } catch (error) {
+    return next(
+      new Error("Something went wrong, please try again later ", 500)
+    );
+  }
+
+  if (isPasswordValid) {
+    res.json({ message: "success", userID: existingUser.id });
+  } else {
+    return next(new Error("Invalid email or password", 422));
+  }
 };
 
 const postUserSignup = async (req, res, next) => {
@@ -62,7 +97,7 @@ const postUserSignup = async (req, res, next) => {
   }
 
   res.status(201);
-  res.json({ message: "success" });
+  res.json({ message: "success", userID: newUser.id });
 };
 
 exports.postUserSignup = postUserSignup;
