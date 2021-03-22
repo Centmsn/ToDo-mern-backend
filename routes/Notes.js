@@ -1,19 +1,20 @@
 const { Router } = require("express");
 
+const Auth = require("../middlewares/Auth");
 const NotesController = require("../controllers/NotesController");
 
 const router = Router();
 
 // get note by ID
-router.get("/", NotesController.getNotes);
+router.get("/", Auth, NotesController.getNote);
 
 // get notes by user ID
-router.get("/user/:id", NotesController.getNotesByUserId);
+router.get("/user/:id", Auth, NotesController.getNotesByUserId);
 
 // create new note
-router.post("/", NotesController.postNote);
+router.post("/", Auth, NotesController.postNote);
 
 // delete note by id
-router.delete("/:id", NotesController.deleteNoteById);
+router.delete("/:id", Auth, NotesController.deleteNoteById);
 
 module.exports = router;

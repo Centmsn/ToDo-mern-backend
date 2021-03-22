@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
 
 const User = require("../models/User");
@@ -28,6 +29,21 @@ const postUserLogin = async (req, res, next) => {
     return next(new Error("User does not exist", 422));
   }
 
+  // create JWT
+  let token;
+  try {
+    token = jwt.sign(
+      {
+        userID: existingUser._id,
+        email: existingUser.email,
+      },
+      process.env.JWT_KEY,
+      { expiresIn: "1h" }
+    );
+  } catch (error) {
+    return next(new Error("Something went wrong, please try again later", 500));
+  }
+
   let isPasswordValid;
 
   try {
@@ -39,7 +55,7 @@ const postUserLogin = async (req, res, next) => {
   }
 
   if (isPasswordValid) {
-    res.json({ message: "success", userID: existingUser.id });
+    res.json({ message: "success", userID: existingUser.id, token });
   } else {
     return next(new Error("Invalid email or password", 422));
   }

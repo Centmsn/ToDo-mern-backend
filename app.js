@@ -1,13 +1,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const mongoDB = require("mongodb");
 
 const notesRouter = require("./routes/Notes");
 const usersRouter = require("./routes/User");
 
-const dbURI =
-  "mongodb+srv://backend:N4I7CAoH7obfpy5P@todo.yobq0.mongodb.net/ToDo?retryWrites=true&w=majority";
+const dbURI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@todo.yobq0.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 const app = express();
 
