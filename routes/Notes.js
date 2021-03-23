@@ -8,11 +8,11 @@ const router = Router();
 // get note by ID
 router.get("/", Auth, NotesController.getNote);
 
-// get notes by user ID
-router.get("/user/:id", Auth, NotesController.getNotesByUserId);
-
 // get user's history by ID
 router.get("/history/user/:id", Auth, NotesController.getHistoryNotesByUserId);
+
+// get notes by user ID
+router.get("/user/:id", Auth, NotesController.getNotesByUserId);
 
 // create new note
 router.post("/", Auth, NotesController.postNote);

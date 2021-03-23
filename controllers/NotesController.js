@@ -10,9 +10,10 @@ exports.getNote = async (req, res, next) => {
 };
 
 exports.getHistoryNotesByUserId = async (req, res, next) => {
+  console.log(req.params.id);
   let notes;
   try {
-    notes = await RemovedNote.find({ creator: req.userId });
+    notes = await RemovedNote.find({ creator: req.params.id });
   } catch (err) {
     return next(
       new HttpError("Could not find history notes, please try again", 500)
