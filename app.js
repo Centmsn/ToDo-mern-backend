@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const notesRouter = require("./routes/Notes");
 const usersRouter = require("./routes/User");
 
-const dbURI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@todo.yobq0.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+const DB_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@todo.yobq0.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
 const app = express();
 
@@ -32,10 +32,9 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(result => {
-    console.log("connected");
-    app.listen(3001);
+    app.listen(process.env.PORT || 3001);
   })
   .catch(err => {
     console.log(err);
