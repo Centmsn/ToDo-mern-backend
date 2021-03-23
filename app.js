@@ -1,6 +1,6 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
 
 const notesRouter = require("./routes/Notes");
 const usersRouter = require("./routes/User");
@@ -9,7 +9,8 @@ const DB_URI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@todo
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(helmet());
 // middlewares for CORS
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

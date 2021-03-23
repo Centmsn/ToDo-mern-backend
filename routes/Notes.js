@@ -11,6 +11,9 @@ router.get("/", Auth, NotesController.getNote);
 // get notes by user ID
 router.get("/user/:id", Auth, NotesController.getNotesByUserId);
 
+// get user's history by ID
+router.get("/history/user/:id", Auth, NotesController.getHistoryNotesByUserId);
+
 // create new note
 router.post("/", Auth, NotesController.postNote);
 

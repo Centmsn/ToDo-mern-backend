@@ -5,6 +5,7 @@ const UserController = require("../controllers/UserController");
 
 const router = Router();
 
+// create user
 router.post(
   "/signup",
   [
@@ -14,6 +15,7 @@ router.post(
   UserController.postUserSignup
 );
 
+// login user
 router.post(
   "/login",
   [

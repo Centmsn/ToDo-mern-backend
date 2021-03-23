@@ -2,11 +2,35 @@ const mongoose = require("mongoose");
 
 const User = require("../models/User");
 const Note = require("../models/Note");
+const RemovedNote = require("../models/Removed");
 const HttpError = require("../models/Error");
 
 exports.getNote = async (req, res, next) => {
-  console.log(req.params.id);
-  res.json({ message: "OK" });
+  res.json({ message: "success" });
+};
+
+exports.getHistoryNotesByUserId = async (req, res, next) => {
+  let notes;
+  try {
+    notes = await RemovedNote.find({ creator: req.userId });
+  } catch (err) {
+    return next(
+      new HttpError("Could not find history notes, please try again", 500)
+    );
+  }
+
+  let creator;
+  try {
+    creator = await User.findById(req.userId);
+  } catch (error) {
+    return next(new HttpError("User not found, please try again", 500));
+  }
+
+  if (creator._id.toString() !== req.userId) {
+    return next(new HttpError("401 Forbidden", 401));
+  }
+
+  res.json({ message: "success", notes });
 };
 
 exports.getNotesByUserId = async (req, res, next) => {
@@ -103,14 +127,25 @@ exports.deleteNoteById = async (req, res, next) => {
     return next(new HttpError("401 forbidden", 401));
   }
 
+  const completedDate = new Date().toISOString();
+  const removed = new RemovedNote({
+    title: note.title,
+    body: note.body,
+    date: completedDate,
+    creator: req.userId,
+  });
+
   try {
     const session = await mongoose.startSession();
     session.startTransaction();
 
     // remove note
     await note.remove({ session });
+    await removed.save({ session });
     // remove note from users collection
     note.creator.notes.pull(note);
+    // add removed note to the user's history
+    note.creator.removedNotes.push(removed);
     await note.creator.save({ session });
     await session.commitTransaction();
   } catch (error) {

@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 module.exports = (req, res, next) => {
   let token = req.get("Authorization");
   if (!token) {
-    return next(new HttpError("Token is not valid", 401));
+    return next(new HttpError("401 Forbidden", 401));
   }
   token = token.split(" ")[1];
 
@@ -12,13 +12,11 @@ module.exports = (req, res, next) => {
   try {
     decodedToken = jwt.verify(token, process.env.JWT_KEY);
   } catch (error) {
-    return next(
-      new HttpError("Could not verify token. Try to login again", 500)
-    );
+    return next(new HttpError("User not recognized. Try to login again", 500));
   }
 
   if (!decodedToken) {
-    return next(new HttpError("Token is not valid", 401));
+    return next(new HttpError("401 Forbidden", 401));
   }
 
   req.userId = decodedToken.userID;

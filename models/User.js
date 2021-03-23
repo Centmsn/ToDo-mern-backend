@@ -10,6 +10,13 @@ const userSchema = new mongoose.Schema({
       ref: "Note",
     },
   ],
+  removedNotes: [
+    {
+      type: mongoose.Types.ObjectId,
+      default: [],
+      ref: "removedNote",
+    },
+  ],
 });
 
 module.exports = mongoose.model("User", userSchema);
