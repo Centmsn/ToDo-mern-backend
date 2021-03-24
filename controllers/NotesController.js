@@ -5,12 +5,41 @@ const Note = require("../models/Note");
 const RemovedNote = require("../models/Removed");
 const HttpError = require("../models/Error");
 
-exports.getNote = async (req, res, next) => {
-  res.json({ message: "success" });
+exports.patchNoteById = async (req, res, next) => {
+  let note;
+  try {
+    note = await Note.findById(req.params.id);
+  } catch (error) {
+    return next(
+      new HttpError("Could not find the note, please try again", 500)
+    );
+  }
+
+  if (!note) {
+    return next(new HttpError("Note does not exist", 500));
+  }
+
+  if (note.creator.toString() !== req.userId) {
+    return next(new HttpError("403 Forbidden", 403));
+  }
+
+  const { body, title } = req.body;
+
+  note.title = title;
+  note.body = body;
+
+  try {
+    await note.save();
+  } catch (error) {
+    return next(
+      new HttpError("Could not update the note, please try again", 500)
+    );
+  }
+
+  res.status(200).json({ message: "success", note });
 };
 
 exports.getHistoryNotesByUserId = async (req, res, next) => {
-  console.log(req.params.id);
   let notes;
   try {
     notes = await RemovedNote.find({ creator: req.params.id });
@@ -28,7 +57,7 @@ exports.getHistoryNotesByUserId = async (req, res, next) => {
   }
 
   if (creator._id.toString() !== req.userId) {
-    return next(new HttpError("401 Forbidden", 401));
+    return next(new HttpError("403 Forbidden", 403));
   }
 
   res.json({ message: "success", notes });
@@ -125,7 +154,7 @@ exports.deleteNoteById = async (req, res, next) => {
 
   // check if creator id matches current user id
   if (note.creator.id !== req.userId) {
-    return next(new HttpError("401 forbidden", 401));
+    return next(new HttpError("403 forbidden", 403));
   }
 
   const completedDate = new Date().toISOString();

@@ -1,12 +1,12 @@
 const { Router } = require("express");
 
-const Auth = require("../middlewares/Auth");
+const Auth = require("../middlewares/auth");
 const NotesController = require("../controllers/NotesController");
 
 const router = Router();
 
 // get note by ID
-router.get("/", Auth, NotesController.getNote);
+router.patch("/:id", Auth, NotesController.patchNoteById);
 
 // get user's history by ID
 router.get("/history/user/:id", Auth, NotesController.getHistoryNotesByUserId);

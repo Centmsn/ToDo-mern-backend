@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 module.exports = (req, res, next) => {
   let token = req.get("Authorization");
   if (!token) {
-    return next(new HttpError("401 Forbidden", 401));
+    return next(new HttpError("403 Forbidden", 403));
   }
   token = token.split(" ")[1];
 
@@ -16,7 +16,7 @@ module.exports = (req, res, next) => {
   }
 
   if (!decodedToken) {
-    return next(new HttpError("401 Forbidden", 401));
+    return next(new HttpError("403 Forbidden", 403));
   }
 
   req.userId = decodedToken.userID;
