@@ -5,6 +5,36 @@ const Note = require("../models/Note");
 const RemovedNote = require("../models/Removed");
 const HttpError = require("../models/Error");
 
+exports.deleteNotesHistory = async (req, res, next) => {
+  let user;
+
+  try {
+    user = await User.findById(req.params.id);
+  } catch (error) {
+    return next(new HttpError("Could not find user, please try again", 500));
+  }
+
+  if (user._id.toString() !== req.params.id) {
+    return next(new HttpError("403 Forbidden", 403));
+  }
+
+  try {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    user.removedNotes = [];
+    await user.save(session);
+    await RemovedNote.deleteMany({ creator: req.params.id });
+
+    await session.commitTransaction();
+  } catch (error) {
+    return next(
+      new HttpError("Could not remove history, please try again", 500)
+    );
+  }
+
+  res.json({ message: "success" });
+};
+
 exports.patchNoteById = async (req, res, next) => {
   let note;
   try {

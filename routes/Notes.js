@@ -11,6 +11,9 @@ router.patch("/:id", Auth, NotesController.patchNoteById);
 // get user's history by ID
 router.get("/history/user/:id", Auth, NotesController.getHistoryNotesByUserId);
 
+// delete notes history by user id
+router.delete("/history/user/:id", Auth, NotesController.deleteNotesHistory);
+
 // get notes by user ID
 router.get("/user/:id", Auth, NotesController.getNotesByUserId);
 
